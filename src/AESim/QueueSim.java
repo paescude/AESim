@@ -49,34 +49,32 @@ public class QueueSim extends SimObject{
 		return b;
 	}
 
-	public Patient removeFromQueue(double time) {
-		patientOutQueue = queue.poll();
-		// patientOutQueue.setCurrentQueue(null);
-		String qName = patientOutQueue.getCurrentQueue().getName();
-		double qTime = getTime() - patientOutQueue.getTimeEnteredCurrentQ();
+	public void removeFromQueue(Patient patient) {
+		queue.remove(patient);
+		String qName = patient.getCurrentQueue().getName();
+		double qTime = getTime() - patient.getTimeEnteredCurrentQ();
 		if (qName.equals("queueR ")) {
-			patientOutQueue.setQueuingTimeQr(qTime);
+			patient.setQueuingTimeQr(qTime);
 			System.out.println("****------******---- "
-					+ patientOutQueue.getId() + " time in " + qName + ": "
-					+ patientOutQueue.getQueuingTimeQr());
+					+ patient.getId() + " time in " + qName + ": "
+					+ patient.getQueuingTimeQr());
 		}
 		if (qName.equals("queueTriage ")) {
-			patientOutQueue.setQueuingTimeQt(qTime);
+			patient.setQueuingTimeQt(qTime);
 			System.out.println("****------******---- "
-					+ patientOutQueue.getId() + " time in " + qName + ": "
-					+ patientOutQueue.getQueuingTimeQt());
+					+ patient.getId() + " time in " + qName + ": "
+					+ patient.getQueuingTimeQt());
 		}
 		if (qName.equals("queueInitA ")) {
-			patientOutQueue.setQueuingTimeQa(qTime);
+			patient.setQueuingTimeQa(qTime);
 			System.out.println("****------******---- "
-					+ patientOutQueue.getId() + " time in " + qName + ": "
-					+ patientOutQueue.getQueuingTimeQa());
+					+ patient.getId() + " time in " + qName + ": "
+					+ patient.getQueuingTimeQa());
 		}
 		if (qName.equals("qTest ")) {
 
 		}
 		totalInQueue = this.queue.size();
-		return patientOutQueue;
 	}
 
 	public void elementsInQueue() {
@@ -98,6 +96,11 @@ public class QueueSim extends SimObject{
 			System.out.println("" + this.getId() + ": "
 					+ a.substring(0, a.length() - 2) + "]");
 	}
+	
+	public int getSize() {
+		return totalInQueue;
+	}
+	
 	public Iterator<Patient> iterator() {
 		return queue.iterator();
 

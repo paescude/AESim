@@ -1,9 +1,16 @@
 package AESim;
 
+import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Queue;
+
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.ContextUtils;
 
 public class SimObject {
 	
@@ -22,6 +29,109 @@ public class SimObject {
 		double time = (RunEnvironment.getInstance().getCurrentSchedule()
 				.getTickCount());
 		return time;
+	}
+	
+	public void printTime() {
+		System.out
+				.println("                                                                              tick: "
+						+ getTime()
+						+ " (week: "
+						+ getWeek()
+						+ " day: "
+						+ getDay()
+						+ " hour: "
+						+ getHour()
+						+ " minute: "
+						+ getMinute() + ")");
+	}
+	protected void removePatientFromDepartment(Patient patient){
+		printTime();
+		System.out.println(patient.getId() + " didn't wait and has left  the department after triage with "+ this.getId());
+		System.out.println(patient.getId() + " goes to qTrolley");
+		patient.addToQ("qTrolley ");
+		patient.setInSystem(false);
+		patient.getTimeInSystem();
+		
+		System.out.println(patient.getId() + " is in system = " + patient.isInSystem());
+		patient.getAllServicesTimes();
+	}
+	protected Resource findResourceAvailable(String resourceType) {
+		Resource rAvailable = null;
+		context = getContext();
+		for (Object o : context.getObjects(Resource.class)) {
+			Resource resource = (Resource) o;
+			if (resource.getResourceType() == resourceType) {
+				System.out.println("resource type? " + resourceType
+						+ " is required here, looking if " + resource.getId()
+						+ " is available? " + resource.isAvailable());
+				if (resource.isAvailable() == true) {
+					rAvailable = resource;
+					break;
+				} else {
+					
+				}
+			}
+		}
+		return rAvailable;
+	}
+	
+	public void printElementsQueue(PriorityQueue<Patient> queueToPrint,
+			String name) {
+
+		Patient patientQueuing = null;
+		Iterator<Patient> iter = queueToPrint.iterator();
+
+		String a = "[";
+		while (iter.hasNext()) {
+			Patient elementInQueue = iter.next();
+
+			if (elementInQueue instanceof Patient) {
+				patientQueuing = elementInQueue;
+				a = a + patientQueuing.getId() + ", ";
+			}
+
+		}
+		if (a.length() > 2)
+			System.out.println("" + this.getId() + " " + name + ": "
+					+ a.substring(0, a.length() - 2) + "]");
+	}
+
+	public void printElementsArray(ArrayList<Patient> arrayToPrint, String name) {
+
+		Patient patientQueuing = null;
+		Iterator<Patient> iter = arrayToPrint.iterator();
+
+		String a = "[";
+		while (iter.hasNext()) {
+			Patient elementInQueue = iter.next();
+
+			if (elementInQueue instanceof Patient) {
+				patientQueuing = elementInQueue;
+				a = a + patientQueuing.getId() + ", ";
+			}
+
+		}
+		if (a.length() > 2)
+			System.out.println("" + this.getId() + " " + name + ": "
+					+ a.substring(0, a.length() - 2) + "]");
+	}
+	
+	public GridPoint getQueueLocation(String name, Grid grid) {
+		GridPoint queueLoc = null;
+		QueueSim queueR = null;
+		context = ContextUtils.getContext(this);
+
+		for (Object o : context.getObjects(QueueSim.class)) {
+			queueR = (QueueSim) o;
+			if (queueR.getName() == name) {
+				queueLoc = grid.getLocation(o);
+				// System.out.println("**** "+ queueR.getId()+ " "
+				// + queueLoc);
+				break;
+			}
+
+		}
+		return queueLoc;
 	}
 	
 	public static void initSaticVar() {
@@ -49,6 +159,7 @@ public class SimObject {
 	}
 
 	public Grid<Object> getGrid() {
+		grid = (Grid) ContextUtils.getContext(this).getProjection("grid");
 		return grid;
 	}
 
@@ -57,6 +168,7 @@ public class SimObject {
 	}
 
 	public GridPoint getLoc() {
+		loc = grid.getLocation(this);
 		return loc;
 	}
 
@@ -65,6 +177,7 @@ public class SimObject {
 	}
 
 	public Context<Object> getContext() {
+		context = ContextUtils.getContext(this);
 		return context;
 	}
 
@@ -73,6 +186,9 @@ public class SimObject {
 	}
 
 	public static double getMinute() {
+		double tick = (RunEnvironment.getInstance().getCurrentSchedule()
+				.getTickCount());
+		minute = (tick % 60);
 		return minute;
 	}
 

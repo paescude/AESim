@@ -3,6 +3,9 @@ package AESim;
 
 
 
+import java.io.IOException;
+
+import Datos.Reader;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
@@ -38,6 +41,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 	public static final int CLERK_MULTITASK = 1;
 	// int clerkInitial = (Integer) params.getValue("clerk_count");
 
+	
 	@Override
 	public Context<Object> build(Context<Object> context) {		
 
@@ -73,18 +77,15 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		
 		
 		
-		
-		for (int i = 1; i <= NUM_CLERK; i++) {
-			Clerk clerk = new Clerk(grid, i, i, 4);
-			context.add(clerk);
-			grid.moveTo(clerk, 17, 4+i);
-		}
+		Administrator admin= Administrator.getAdmin();
+		context.add(admin);
+
 
 		for (int i = 1; i <= TRIAGE_CUBLICLES; i++) {
 			Resource cubicleTriage = new Resource("triage cubicle ",
 					"triage cublicle " + i, grid);
 			context.add(cubicleTriage);
-			grid.moveTo(cubicleTriage, i + 1, 3);
+			grid.moveTo(cubicleTriage, i + 3, 3);
 		}
 
 //		for (int i = 1; i <= trolleys; i++) {
@@ -128,37 +129,43 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 			context.add(testRooms);
 			grid.moveTo(testRooms, i + 10, 11);
 		}
+		
+		for (int i = 1; i <= NUM_CLERK; i++) {
+			Clerk clerk = new Clerk(grid, i, i, 3, CLERK_MULTITASK);
+			context.add(clerk);
+			grid.moveTo(clerk, 17, 4+i);
+		}
 		// Doctors
 	
 		for (int i = 1; i <= NUM_SHO; i++) {			
-			Doctor doctor = new Sho(grid, 6 + i, 4, "SHO ", i, SHO_MULTITASK);
+			Doctor doctor = new Sho(grid, 6 + i, 5, i, SHO_MULTITASK);
 			context.add(doctor);
 			grid.moveTo(doctor, 19, 4 + i);
 		}
 
-		for (int i = 0; i <= NUM_CONSULTANT - 1; i++) {
+		for (int i = 1; i <= NUM_CONSULTANT; i++) {
 			
-			Doctor doctor = new Consultant(grid, 6 + i, 0, "Consultant ", i, CONSULTANT_MULTITASK);
+			Doctor doctor = new Consultant(grid, 6 + i, 0, i, CONSULTANT_MULTITASK);
 			context.add(doctor);
 			grid.moveTo(doctor, i + 6, 0);
 		
 		}
-//		Exit exit;
-//		try {
-//			exit = new Exit(grid, currentRun);
-//			context.add(exit);
-//			grid.moveTo(exit, 14, 5);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		WalkInDoor walkIn = new WalkInDoor("Door ", "WalkIn Door", grid);
-//		context.add(walkIn);
-//		grid.moveTo(walkIn, 0, 0);
-//
-//		AmbulanceIn ambulanceIn = new AmbulanceIn("Door ", "Ambulance Door",
-//				grid);
-//		context.add(ambulanceIn);
-//		grid.moveTo(ambulanceIn, 0, 6);	
+		Exit exit;
+		try {
+			exit = new Exit(grid, currentRun);
+			context.add(exit);
+			grid.moveTo(exit, 14, 5);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		WalkInDoor walkIn = new WalkInDoor("Door ", "WalkIn Door", grid);
+		context.add(walkIn);
+		grid.moveTo(walkIn, 0, 0);
+
+		AmbulanceIn ambulanceIn = new AmbulanceIn("Door ", "Ambulance Door",
+				grid);
+		context.add(ambulanceIn);
+		grid.moveTo(ambulanceIn, 0, 6);	
 
 		// int nurseInitial = (Integer) params.getValue("nurse_count");
 		for (int i = 1; i <= NUM_NURSES; i++) {
@@ -171,28 +178,27 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		
 
 		// int patientInitial = (Integer) params.getValue("patient_count");
-		for (int i = 1; i <= NUM_PATIENTS; i++) {
-			Patient patient = new Patient(grid, "Context", 0);
-			context.add(patient);
-			// int x= (int) (50* Math.random());
-			// int y= (int) (50* Math.random());
-			// grid.moveTo(patient, x,y);
-			grid.moveTo(patient, 1, 0);
-
-		}
+//		for (int i = 1; i <= NUM_PATIENTS; i++) {
+//			Patient patient = new Patient(grid, "Context", 0);
+//			context.add(patient);
+//			// int x= (int) (50* Math.random());
+//			// int y= (int) (50* Math.random());
+//			// grid.moveTo(patient, x,y);
+//			grid.moveTo(patient, 1, 0);
+//		}
 
 		SimObject simObject = new SimObject();
 		context.add(simObject);
-		QueueSim QueueSimBReassess = new QueueSim("QueueSimBReassess ", grid);
-		context.add(QueueSimBReassess);
-		grid.moveTo(QueueSimBReassess, 7, 9);
-		QueueSim QueueSimR = new QueueSim("QueueSimR ", grid);
-		context.add(QueueSimR);
-		grid.moveTo(QueueSimR, 1, 1);
+		QueueSim queueBReassess = new QueueSim("queueBReassess ", grid);
+		context.add(queueBReassess);
+		grid.moveTo(queueBReassess, 7, 9);
+		QueueSim queueR = new QueueSim("queueR ", grid);
+		context.add(queueR);
+		grid.moveTo(queueR, 1, 1);
 		// grid.moveTo(QueueSimR, 15, 0);
-		QueueSim QueueSimTriage = new QueueSim("QueueSimTriage ", grid);
-		context.add(QueueSimTriage);
-		grid.moveTo(QueueSimTriage, 2, 1);
+		QueueSim queueTriage = new QueueSim("queueTriage ", grid);
+		context.add(queueTriage);
+		grid.moveTo(queueTriage, 2, 1);
 		// grid.moveTo(QueueSimTriage, 16, 0);
 		QueueSim qBlue = new QueueSim("qBlue ", grid);
 		context.add(qBlue);
@@ -218,6 +224,13 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		QueueSim qTrolley = new QueueSim("qTrolley ", grid);
 		context.add(qTrolley);
 		grid.moveTo(qTrolley, 15, 7);
+		
+		try {
+			Reader.readAllData();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		if (RunEnvironment.getInstance().isBatch()) {
 			RunEnvironment.getInstance().endAt(524160);// End the simulation
